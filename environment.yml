@@ -1,0 +1,11 @@
+name: alpr
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=2.7
+  - numpy=1.14
+  - opencv=2.4.9
+  - keras=2.2.4
+  - tensorflow=1.5.0
