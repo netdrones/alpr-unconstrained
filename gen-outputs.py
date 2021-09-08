@@ -8,9 +8,6 @@ from src.utils 					import crop_region, image_files_from_folder
 from src.drawing_utils			import draw_label, draw_losangle, write2img
 from src.label 					import lread, Label, readShapes
 
-from pdb import set_trace as pause
-
-
 YELLOW = (  0,255,255)
 RED    = (  0,  0,255)
 
@@ -57,5 +54,3 @@ for img_file in img_files:
 
 	cv2.imwrite('%s/%s_output.png' % (output_dir,bname),I)
 	sys.stdout.write('\n')
-
-
