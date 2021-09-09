@@ -18,39 +18,38 @@ img_files = image_files_from_folder(input_dir)
 
 for img_file in img_files:
 
-	bname = splitext(basename(img_file))[0]
+    bname = splitext(basename(img_file))[0]
+    I = cv2.imread(img_file)
+    detected_cars_labels = '%s/%s_cars.txt' % (output_dir,bname)
+    Lcar = lread(detected_cars_labels)
 
-	I = cv2.imread(img_file)
+    if Lcar:
 
-	detected_cars_labels = '%s/%s_cars.txt' % (output_dir,bname)
+        for i, lcar in enumerate(Lcar):
 
-	Lcar = lread(detected_cars_labels)
+            draw_label(I,lcar,color=YELLOW,thickness=3)
+            lp_label        = '%s/%s_%dcar_lp.txt'     % (output_dir,bname,i)
+            lp_label_str    = '%s/%s_%dcar_lp_str.txt'  % (output_dir,bname,i)
+            class_label     = '%s/%s_%dcar_class.txt'   % (output_dir,bname,i)
 
-	sys.stdout.write('%s' % bname)
+            if isfile(class_label):
+                with open(class_label, 'r') as f:
+                    class_str = f.read().strip()
+                    clp = Label(0,tl=lcar.tl(),br=lcar.br())
+                    clp.set_wh(clp.wh()/2)
+                    write2img(I, clp, class_str)
 
-	if Lcar:
+            if isfile(lp_label):
 
-		for i,lcar in enumerate(Lcar):
+                Llp_shapes = readShapes(lp_label)
+                pts = Llp_shapes[0].pts*lcar.wh().reshape(2,1) + lcar.tl().reshape(2,1)
+                ptspx = pts*np.array(I.shape[1::-1],dtype=float).reshape(2,1)
+                draw_losangle(I,ptspx,RED,3)
 
-			draw_label(I,lcar,color=YELLOW,thickness=3)
+                if isfile(lp_label_str):
+                    with open(lp_label_str,'r') as f:
+                        lp_str = f.read().strip()
+                    llp = Label(0,tl=pts.min(1),br=pts.max(1))
+                    write2img(I,llp,lp_str)
 
-			lp_label 		= '%s/%s_%dcar_lp.txt'		% (output_dir,bname,i)
-			lp_label_str 	= '%s/%s_%dcar_lp_str.txt'	% (output_dir,bname,i)
-
-			if isfile(lp_label):
-
-				Llp_shapes = readShapes(lp_label)
-				pts = Llp_shapes[0].pts*lcar.wh().reshape(2,1) + lcar.tl().reshape(2,1)
-				ptspx = pts*np.array(I.shape[1::-1],dtype=float).reshape(2,1)
-				draw_losangle(I,ptspx,RED,3)
-
-				if isfile(lp_label_str):
-					with open(lp_label_str,'r') as f:
-						lp_str = f.read().strip()
-					llp = Label(0,tl=pts.min(1),br=pts.max(1))
-					write2img(I,llp,lp_str)
-
-					sys.stdout.write(',%s' % lp_str)
-
-	cv2.imwrite('%s/%s_output.png' % (output_dir,bname),I)
-	sys.stdout.write('\n')
+    cv2.imwrite('%s/%s_output.png' % (output_dir,bname),I)
