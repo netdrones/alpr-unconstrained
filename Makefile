@@ -6,7 +6,7 @@ CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activ
 install:
 	conda env update -f environment.yml
 	if [ ! -d darknet/obj ]; then cd darknet && make; fi
-	if [ ! -d data ]; then sh +x get-networks.sh; fi
+	if [ ! -d data ]; then bash +x get-networks.sh; fi
 
 car-test:
 	if [ ! -d cars ]; then gsutil -m cp -r gs://lucas.netdron.es/cars .; fi
